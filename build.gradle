@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+   mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:15.0'
+    compile 'com.sparkjava:spark-core:1.1.1'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.github.spullara.mustache.java:compiler:0.8.15'
+    compile ('org.reflections:reflections:0.9.9-RC2'){
+    	exclude group: 'org.javassist', module:'javassist'
+    }
+    compile 'org.javassist:javassist:3.18.2-GA'
+
+    testCompile 'junit:junit:4.11'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
+}
+
