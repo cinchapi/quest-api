@@ -21,6 +21,7 @@ dependencies {
     	exclude group: 'org.javassist', module:'javassist'
     }
     compile 'org.javassist:javassist:3.18.2-GA'
+    compile 'ch.qos.logback:logback-classic:1.0.13'
 
     testCompile 'junit:junit:4.11'
 }
