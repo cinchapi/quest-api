@@ -38,6 +38,11 @@ import spark.template.mustache.MustacheTemplateRoute;
  * A {@link RewritableRoute} is one that can have its path altered in certain
  * circumstances. This base class provides some methods to do re-writing in a
  * convenient way.
+ * <p>
+ * <em>Rather than extending this class directly, consider using
+ * {@link AbstractRewritableRoute} as a parent class since it takes care of some
+ * boilerplate scaffolding and provides some helpful utility functions.</em>
+ * </p>
  * 
  * @author jnelson
  */
@@ -50,14 +55,14 @@ public abstract class RewritableRoute extends MustacheTemplateRoute {
     /**
      * The {@link Request} object that is associated with this {@link Route}.
      * While this object is accessible to subclasses, caution should be
-     * exercised when operating on the objects directly.
+     * exercised when operating on this object directly.
      */
     protected Request request;
 
     /**
      * The {@link Response} object that is associated with this {@link Route}.
      * While this object is accessible to subclasses, caution should be
-     * exercised when operating on the objects directly.
+     * exercised when operating on this object directly.
      */
     protected Response response;
 
@@ -71,7 +76,7 @@ public abstract class RewritableRoute extends MustacheTemplateRoute {
     }
 
     /**
-     * ReWrite this {@link Route} by prepending the {@code namespace} to the
+     * Rewrite this {@link Route} by prepending the {@code namespace} to the
      * relative path that was specified in the constructor.
      * 
      * @param namespace
@@ -94,8 +99,9 @@ public abstract class RewritableRoute extends MustacheTemplateRoute {
                 Preconditions.checkState(field != null);
                 field.setAccessible(true);
                 String path = (String) field.get(this);
-                path = namespace + path; // path should always begin with a
-                                         // leading slash (/)
+                Preconditions.checkState(path.startsWith("/"), "The relative "
+                        + "path must begin with a forward slash");
+                path = namespace + path;
                 field.set(this, path);
             }
             catch (ReflectiveOperationException e) {

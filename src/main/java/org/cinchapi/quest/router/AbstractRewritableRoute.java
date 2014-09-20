@@ -1,6 +1,9 @@
 package org.cinchapi.quest.router;
 
+import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import org.cinchapi.quest.util.Objects;
 
@@ -12,24 +15,37 @@ import spark.Response;
 /**
  * The base class for routes that desire abstract request/response boilerplate
  * and scaffolding.
+ * <p>
+ * This class provides some utility functions around some of the native route
+ * components with a cleaner interface.
+ * </p>
+ * <h2>Preconditions</h2>
+ * <ul>
+ * <li>Use the {@link #require(Object...)} method to ensure that the necessary
+ * variables are all non-empty before continuing in the route, halting if the
+ * check fails.</li>
+ * </ul>
+ * <h2>Redirection</h2>
+ * <ul>
+ * <li>Use the {@link Response#redirect(String) response.redirect(String)}
+ * method to trigger a browser redirect to another location</li>
+ * </ul>
  * 
- * @author jeffnelson
- * 
+ * @author jnelson
  */
 public abstract class AbstractRewritableRoute extends RewritableRoute {
 
     /**
      * A collection that only contains an empty string, which is used to filter
-     * lists.
+     * lists (i.e. {@link List#removeAll(java.util.Collection)} empty strings).
      */
     private static List<String> EMPTY_STRING_COLLECTION = Lists
             .newArrayList("");
 
     /**
-     * Check to ensure that any of the specified required {@link params} is
-     * not {@code null} or an empty string or an empty collection. If so, halt
-     * the request
-     * immediately.
+     * Check to ensure that none of the specified {@link params} is {@code null}
+     * or an empty string or an empty collection. If so, halt
+     * the request immediately.
      * 
      * @param params
      */
@@ -53,10 +69,15 @@ public abstract class AbstractRewritableRoute extends RewritableRoute {
     /**
      * Return the list of values mapped from a parameter associated with the
      * request being processed. This method is only appropriate for query
-     * params.
+     * params and will not work for route variables (because those cannot
+     * contain multiple values).
+     * <p>
+     * <strong>NOTE:</strong> If there are no values for {@code param}, then an
+     * empty list is returned.
+     * </p>
      * 
      * @param param
-     * @return the array of values
+     * @return the (possibly empty) list of values
      */
     protected List<String> getParamValues(String param) {
         try {
@@ -67,36 +88,27 @@ public abstract class AbstractRewritableRoute extends RewritableRoute {
         }
         catch (NullPointerException e) { // the param is not in the map, so
                                          // return an empty array
-            return Lists.newArrayList();
+            return Collections.unmodifiableList(EMPTY_STRING_COLLECTION);
         }
     }
 
     /**
      * Return a parameter associated with the request being processed.
      * <p>
-     * Prepend the name of the parameter with ":" if it is a variable in the
-     * route (i.e. /foo/:id). Otherwise, it is assumed to be a query param (i.e.
-     * /foo?id=).
+     * Prepend the name of the parameter with {@code ":"} if it is a variable in
+     * the route (i.e. /foo/:id). Otherwise, if the name of the parameter does
+     * not start with {@code ":"} then it is assumed to be a variable in the
+     * query string. (i.e. /foo?id=).
      * </p>
      * 
      * @param param
-     * @return the value associated with the param
+     * @return the value associated with the param or {@code null} if it is not
+     *         provided or not found
      */
+    @Nullable
     protected final String getParamValue(String param) {
         return param.startsWith(":") ? request.params(param) : request
                 .queryParams(param);
-    }
-
-    /**
-     * Redirect the browse to {@code path}. This method always returns
-     * {@code NULL}.
-     * 
-     * @param path
-     * @return {@code NULL}
-     */
-    protected <T> T redirect(String path) {
-        response.redirect(path);
-        return null;
     }
 
     /**

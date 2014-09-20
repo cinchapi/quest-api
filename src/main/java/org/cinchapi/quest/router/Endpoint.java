@@ -28,10 +28,12 @@ import org.cinchapi.quest.util.Exceptions;
 import spark.HaltException;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 /**
- * An {@link Endpoint} is processed by a Controller in order to return a JSON
+ * An {@link Endpoint} is processed by a {@link Router} in order to return a
+ * JSON
  * payload. In particular, this class takes care of some scaffolding,
  * error handling, etc.
  * <p>
@@ -46,7 +48,12 @@ import com.google.gson.JsonObject;
  * @author jnelson
  */
 public abstract class Endpoint extends AbstractRewritableRoute {
-    
+
+    /**
+     * A {@link JsonElement} that represents the lack of any data being
+     * returned.
+     */
+    protected static JsonNull NO_DATA = JsonNull.INSTANCE;
 
     /**
      * A message indicating the request succeeded.
@@ -66,19 +73,19 @@ public abstract class Endpoint extends AbstractRewritableRoute {
     public Endpoint(String path) {
         super(path);
     }
-    
+
     @Override
     public final Object handle() {
         JsonObject json = new JsonObject();
         try {
             json.addProperty("status", STATUS_SUCCESS);
-            json.add("payload", go());
+            json.add("payload", serve());
         }
         catch (HaltException e) {
             throw e;
         }
         catch (Exception e) {
- 
+
             json.addProperty("status", STATUS_FAILED);
             json.addProperty("payload", Exceptions.getMessage(e));
         }
@@ -86,13 +93,18 @@ public abstract class Endpoint extends AbstractRewritableRoute {
         return json;
     }
 
-
     /**
-     * Do the work to handle the request and return a {@link JsonElement}
-     * payload.
+     * Serve the request with a {@link JsonElement} payload.
+     * <p>
+     * If this method returns, then the Router will assume that the request was
+     * successful. If, for any reason, an error occurs, this method should throw
+     * an Exception and the Router will wrap that in the appropriate response to
+     * the caller.
+     * </p>
      * 
      * @return the payload
+     * @throws Exception
      */
-    protected abstract JsonElement go();
+    protected abstract JsonElement serve() throws Exception;
 
 }

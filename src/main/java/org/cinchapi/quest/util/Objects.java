@@ -35,20 +35,23 @@ import com.google.common.base.Strings;
 public class Objects {
 
     /**
-     * Return {@code true} if {@code object} is {@code null} or considered
-     * empty.
-     * <p>
-     * A non-null object is considered empty if it is an empty string or an
-     * empty collection.
-     * </p>
+     * Return {@code true} if {@code value} is {@code null} or considered empty.
+     * A value is considered empty if:
+     * <ul>
+     * <li>It is a collection with no members</li>
+     * <li>It is an array with a length of 0</li>
+     * <li>It is a string with no characters</li>
+     * </ul>
      * 
-     * @param object
-     * @return {@code true} if the object is null or empty
+     * @param value
+     * @return {@code true} if the object is considered null or empty
      */
-    public static boolean isNullOrEmpty(Object object) {
-        return object == null
-                || (object instanceof String
-                        && Strings.isNullOrEmpty((String) object) || (object instanceof Collection && ((Collection<?>) object)
-                        .isEmpty()));
+    public static boolean isNullOrEmpty(Object value) {
+        return value == null
+                || (value instanceof Collection && ((Collection<?>) value)
+                        .isEmpty())
+                || (value.getClass().isArray() && ((Object[]) value).length == 0)
+                || (value instanceof String && Strings
+                        .isNullOrEmpty((String) value));
     }
 }
