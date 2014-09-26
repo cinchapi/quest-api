@@ -30,7 +30,7 @@ public abstract class Routine extends AbstractRewritableRoute {
 
     /**
      * Run the routine. If, for some reason, the routine fails, you may call
-     * {@link #halt()} or throw an exception.
+     * {@link #halt()}, or redirect to another route or throw an exception.
      */
     protected abstract void run();
 

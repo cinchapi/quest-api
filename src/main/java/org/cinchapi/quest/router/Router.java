@@ -70,7 +70,7 @@ public abstract class Router {
 
             @Override
             public void handle(Request request, Response response) {
-                routine.run();
+                routine.handle(request, response);
             }
 
         });
@@ -88,7 +88,7 @@ public abstract class Router {
 
             @Override
             public void handle(Request request, Response response) {
-                routine.run();
+                routine.handle(request, response);
 
             }
 
