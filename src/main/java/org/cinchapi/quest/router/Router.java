@@ -76,15 +76,6 @@ public abstract class Router {
         });
     }
 
-    /*
-     * TODO
-     * Use reflection to
-     * 1) call Spark.addRoute(HttpMethod.before().name(), route)
-     * 2) will need to create a Filter class that is rewritable but does not
-     * take a specific path...instead if just matches everything in the
-     * namespace...probably need to always put a (*) behind the name
-     */
-
     /**
      * Run this {@code routine} before any of the routes defined in this
      * {@link Router} are run.
