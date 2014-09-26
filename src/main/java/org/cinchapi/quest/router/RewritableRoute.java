@@ -76,6 +76,32 @@ public abstract class RewritableRoute extends MustacheTemplateRoute {
     }
 
     /**
+     * Get the path that describes this route.
+     * 
+     * @return the path
+     */
+    protected String getRoutePath() {
+        try {
+            Class<?> parent = this.getClass().getSuperclass();
+            Field field = null;
+            while (field == null && parent != Object.class) {
+                try {
+                    field = parent.getDeclaredField("path");
+                }
+                catch (NoSuchFieldException e) {
+                    parent = parent.getSuperclass();
+                }
+            }
+            Preconditions.checkState(field != null);
+            field.setAccessible(true);
+            return (String) field.get(this);
+        }
+        catch (ReflectiveOperationException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    /**
      * Rewrite this {@link Route} by prepending the {@code namespace} to the
      * relative path that was specified in the constructor.
      * 
@@ -99,8 +125,7 @@ public abstract class RewritableRoute extends MustacheTemplateRoute {
                 Preconditions.checkState(field != null);
                 field.setAccessible(true);
                 String path = (String) field.get(this);
-                Preconditions.checkState(path.startsWith("/"), "The relative "
-                        + "path must begin with a forward slash");
+                path = path.startsWith("/") ? path : "/" + path;
                 path = namespace + path;
                 field.set(this, path);
             }
